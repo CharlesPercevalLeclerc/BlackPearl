@@ -317,7 +317,7 @@
 
             const sign = (v) => v > 0 ? "+" : "";
 
-            return `LAPORAN HARIAN BLACKPEARL
+            return `LAPORAN HARIAN 
 Toko : ${document.getElementById('namaToko').value || '-'}
 Tgl : ${fullTgl}
 
@@ -339,7 +339,18 @@ Growth : ${sign(growStd)}${growStd}%
 
 APC Sekarang : ${fmt(apcNow)}
 APC Lalu : ${fmt(parse('apcLalu'))}
-Growth : ${sign(growApc)}${growApc}%`;
+Growth : ${sign(growApc)}${growApc}%
+
+Target tarik tunai perday : 9
+Akm tarik tunai :
+SPD tarik tunai :
+
+Target new member I-SAKU :
+Pencapaian : 0
+Target new member point ku :
+Pencapaian : 0
+Target new member klik :
+Pencapaian : 0`;
         }
 
         function generate() {
