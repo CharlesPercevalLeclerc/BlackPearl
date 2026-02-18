@@ -5,290 +5,296 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlackPearl | Pro Timestamp</title>
     
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@700&family=Oswald:wght@700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        :root {
-            --bg-dark: #0a0a0c; --card-bg: #16161a; --accent: #3b82f6;
-            --text-main: #ffffff; --text-dim: #94a3b8; --danger: #ef4444;
+        :root { 
+            --bg-dark: #0a0a0c; 
+            --card-bg: rgba(22, 22, 26, 0.8); 
+            --accent: #3b82f6; 
+            --text-main: #f8fafc; 
+            --text-dim: #94a3b8;
+            --border-color: #262626;
+            --input-bg: #0f172a;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); padding: 20px; }
         
-        /* Background Effect */
+        body { 
+            background-color: var(--bg-dark); 
+            color: var(--text-main); 
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background Gradient sesuai Landing Page */
         body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%); z-index: -1;
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%);
+            z-index: -1;
         }
 
-        .nav-btn {
-            position: fixed; top: 20px; left: 20px; z-index: 1000; background: var(--card-bg); 
-            border: 1px solid #333; color: white; padding: 10px; border-radius: 12px;
-            cursor: pointer; display: flex; align-items: center; text-decoration: none;
+        /* Header Gaya Classic (Sesuai Foto) */
+        .hero-section {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+        .hero-section h1 {
+            font-size: 2.5rem;
+            font-weight: 900;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+        }
+        .hero-section h1 span { color: #3b82f6; }
+        .hero-section p {
+            color: var(--text-dim);
+            font-size: 1rem;
+            margin-top: 5px;
+            font-weight: 500;
         }
 
-        .container { width: 100%; max-width: 700px; margin: 60px auto; }
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { font-size: 2rem; font-weight: 800; }
-        header h1 span { color: var(--accent); }
+        /* Main Container */
+        .main-container {
+            width: 100%;
+            max-width: 800px;
+        }
 
         .card { 
-            background: var(--card-bg); padding: 20px; border-radius: 20px; 
-            border: 1px solid #262626; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
+            backdrop-filter: blur(10px);
         }
 
-        label { display: block; margin-bottom: 8px; font-size: 0.8rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; }
-        input, select, textarea { 
-            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #333; 
-            background: #0f0f12; color: white; margin-bottom: 15px; font-size: 0.95rem;
+        label { 
+            display: flex; align-items: center; gap: 8px; font-size: 0.85rem; 
+            color: var(--text-main); margin-bottom: 15px; 
+            font-weight: 700;
         }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        #map { height: 250px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #333; }
-
-        /* Search Results */
-        .search-wrapper { position: relative; }
-        #search-results { 
-            position: absolute; width: 100%; background: #1f1f23; z-index: 1001; 
-            border-radius: 10px; max-height: 200px; overflow-y: auto; 
-        }
-        .search-item { padding: 10px; border-bottom: 1px solid #333; cursor: pointer; font-size: 0.85rem; }
-        .search-item:hover { background: var(--accent); }
-
-        .btn-main { 
-            background: var(--accent); color: white; border: none; padding: 15px; 
-            border-radius: 12px; font-weight: 800; width: 100%; cursor: pointer; 
-            transition: 0.3s; font-size: 1.1rem;
-        }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
-
-        canvas { width: 100%; border-radius: 15px; margin-top: 20px; border: 1px solid #333; display: none; }
         
-        .cropper-container { max-height: 400px !important; margin-bottom: 15px; }
+        input, select, textarea { 
+            width: 100%; padding: 14px; border-radius: 8px; border: 1px solid #334155; 
+            background: var(--input-bg); color: var(--text-main); font-size: 0.95rem; 
+            margin-bottom: 15px;
+        }
 
-        @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } }
+        #map { height: 250px; border-radius: 10px; border: 1px solid #334155; margin-bottom: 15px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        .btn { 
+            background: var(--accent); color: white; border: none; padding: 18px; 
+            border-radius: 10px; font-weight: 800; width: 100%; cursor: pointer; 
+            display: flex; align-items: center; justify-content: center; gap: 10px; 
+            font-size: 1rem; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .btn-loc { background: #059669; font-size: 0.75rem; padding: 12px; margin-bottom: 15px; }
+
+        /* Result Area */
+        #preview-container { margin-top: 30px; display: grid; gap: 30px; width: 100%; }
+        .result-item { 
+            background: var(--card-bg); padding: 15px; border-radius: 12px; 
+            border: 1px solid var(--border-color);
+        }
+        canvas { width: 100%; border-radius: 8px; display: block; }
+        .dl-btn { 
+            background: #4f46e5; color: white; text-decoration: none; display: block; 
+            padding: 15px; border-radius: 8px; text-align: center; margin-top: 15px; 
+            font-weight: 700;
+        }
+
+        /* Back Button Floating */
+        .back-nav {
+            position: absolute; top: 20px; left: 20px;
+        }
+        .back-link { color: var(--text-dim); text-decoration: none; font-size: 1.5rem; }
     </style>
 </head>
 <body>
 
-<a href="../index.html" class="nav-btn"><i data-lucide="arrow-left"></i></a>
+<div class="back-nav">
+    <a href="../index.html" class="back-link"><i data-lucide="arrow-left"></i></a>
+</div>
 
-<div class="container">
-    <header>
-        <h1>BLACK<span>PEARL</span> STAMP</h1>
-        <p>Fake Timestamp Pro Generator</p>
-    </header>
+<div class="hero-section">
+    <h1>BLACK<span>PEARL</span> STAMP</h1>
+    <p>Fake Timestamp Pro Generator</p>
+</div>
 
+<div class="main-container">
     <div class="card">
-        <label><i data-lucide="image"></i> Pilih Foto</label>
-        <input type="file" id="upload" accept="image/*">
-        <div id="img-wrapper" style="display:none;"><img id="image" style="max-width: 100%;"></div>
+        <label><i data-lucide="image"></i> PILIH FOTO</label>
+        <input type="file" id="bulk-input" accept="image/*" multiple>
     </div>
 
     <div class="card">
-        <label><i data-lucide="map-pin"></i> Lokasi & Alamat</label>
-        <div class="search-wrapper">
-            <input type="text" id="addr-search" placeholder="Cari lokasi...">
-            <div id="search-results"></div>
-        </div>
+        <label><i data-lucide="map-pin"></i> SET LOKASI</label>
+        <button class="btn btn-loc" id="get-geo"><i data-lucide="navigation"></i> GUNAKAN GPS LOKASI SAYA</button>
         <div id="map"></div>
         <textarea id="address" rows="3" placeholder="Detail alamat..."></textarea>
     </div>
 
     <div class="card">
-        <label><i data-lucide="layout"></i> Kustomisasi Tampilan</label>
+        <label><i data-lucide="settings"></i> KONFIGURASI TEMPLATE</label>
         <div class="grid">
             <div>
-                <label>Template Style</label>
-                <select id="templateStyle">
-                    <option value="classic">Classic White (Default)</option>
-                    <option value="modern_blue">Modern Electric Blue</option>
-                    <option value="minimal_bold">Minimalist Bold</option>
-                    <option value="orange_label">Orange Safety Label</option>
-                    <option value="hacker_green">Matrix Hacker Green</option>
+                <select id="t-style">
+                    <option value="modern">Modern Default</option>
+                    <option value="elegant">Elegant Badge</option>
+                    <option value="polaroid">Polaroid Style</option>
+                    <option value="glass">Glassmorphism</option>
+                    <option value="outline">Bold Outline</option>
                 </select>
             </div>
             <div>
-                <label>Warna Font</label>
-                <input type="color" id="fontColor" value="#ffffff">
-            </div>
-            <div>
-                <label>Ukuran Font</label>
-                <select id="fontSize">
-                    <option value="0.8">Kecil</option>
-                    <option value="1" selected>Normal</option>
-                    <option value="1.3">Besar</option>
-                    <option value="1.6">Sangat Besar</option>
+                <select id="t-font">
+                    <option value="Inter">Inter UI</option>
+                    <option value="'JetBrains Mono'">Mono Space</option>
+                    <option value="'Oswald'">Oswald Bold</option>
                 </select>
             </div>
-            <div>
-                <label>Waktu</label>
-                <input type="datetime-local" id="timestamp">
-            </div>
+        </div>
+        <div class="grid">
+            <input type="color" id="t-color" value="#ffffff">
+            <input type="datetime-local" id="t-time">
+        </div>
+        <div class="grid">
+            <div><small>Brightness</small><input type="range" id="f-br" min="50" max="150" value="100"></div>
+            <div><small>Contrast</small><input type="range" id="f-ct" min="50" max="150" value="100"></div>
         </div>
     </div>
 
-    <button id="process-btn" class="btn-main">GENERATE STAMP</button>
+    <button class="btn" id="generate-all"><i data-lucide="zap"></i> GENERATE SEKARANG</button>
 
-    <div id="result-area" style="text-align: center;">
-        <canvas id="canvas-preview"></canvas>
-        <div id="download-area" style="margin-top: 20px;"></div>
-    </div>
-
-    <footer style="text-align: center; margin-top: 30px; color: var(--text-dim); font-size: 0.8rem;">
-        BlackPearl System &copy; 2026 | Created with 🔥
-    </footer>
+    <div id="preview-container"></div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-let cropper, map, marker;
 lucide.createIcons();
 
 // --- MAP LOGIC ---
-map = L.map('map').setView([-6.2000, 106.8166], 13);
+let map = L.map('map').setView([-6.20, 106.81], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-marker = L.marker([-6.2000, 106.8166], {draggable: true}).addTo(map);
+let marker = L.marker([-6.20, 106.81]).addTo(map);
 
-const addrSearch = document.getElementById('addr-search');
-const resultsDiv = document.getElementById('search-results');
+map.on('click', (e) => {
+    marker.setLatLng(e.latlng);
+    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${e.latlng.lat}&lon=${e.latlng.lng}`)
+        .then(r => r.json())
+        .then(d => { document.getElementById('address').value = d.display_name; });
+});
 
-addrSearch.addEventListener('input', async function() {
-    if (this.value.length < 3) return;
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${this.value}&limit=5`);
-    const data = await res.json();
-    resultsDiv.innerHTML = '';
-    data.forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'search-item';
-        div.innerText = item.display_name;
-        div.onclick = () => {
-            map.setView([item.lat, item.lon], 17);
-            marker.setLatLng([item.lat, item.lon]);
-            document.getElementById('address').value = item.display_name;
-            resultsDiv.innerHTML = '';
-        };
-        resultsDiv.appendChild(div);
+document.getElementById('get-geo').onclick = () => {
+    navigator.geolocation.getCurrentPosition(p => {
+        const {latitude, longitude} = p.coords;
+        map.setView([latitude, longitude], 17);
+        marker.setLatLng([latitude, longitude]);
+        map.fire('click', {latlng: {lat: latitude, lng: longitude}});
     });
-});
-
-marker.on('dragend', async () => {
-    const pos = marker.getLatLng();
-    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.lat}&lon=${pos.lng}`);
-    const data = await res.json();
-    document.getElementById('address').value = data.display_name;
-});
-
-// --- CROPPER LOGIC ---
-document.getElementById('upload').onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const img = document.getElementById('image');
-            img.src = event.target.result;
-            document.getElementById('img-wrapper').style.display = 'block';
-            if (cropper) cropper.destroy();
-            cropper = new Cropper(img, { aspectRatio: 3/4, viewMode: 1 });
-        };
-        reader.readAsDataURL(file);
-    }
 };
 
-// Set Now
+// --- CORE LOGIC ---
+let imageFiles = [];
+document.getElementById('bulk-input').onchange = (e) => { imageFiles = [...e.target.files]; };
+
 const now = new Date();
 now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-document.getElementById('timestamp').value = now.toISOString().slice(0,16);
+document.getElementById('t-time').value = now.toISOString().slice(0,16);
 
-// --- DRAWING ENGINE ---
-document.getElementById('process-btn').onclick = function() {
-    if (!cropper) return alert("Upload foto dulu!");
-
-    const canvas = document.getElementById('canvas-preview');
-    const ctx = canvas.getContext('2d');
-    const targetWidth = 1080;
-    const targetHeight = 1440; // 3:4 ratio
-
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    canvas.style.display = 'block';
-
-    ctx.drawImage(cropper.getCroppedCanvas(), 0, 0, targetWidth, targetHeight);
-
-    const dateObj = new Date(document.getElementById('timestamp').value);
-    const jam = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-    const tanggal = dateObj.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' }).toUpperCase();
-    const hari = dateObj.toLocaleDateString('id-ID', { weekday: 'long' });
-    const alamat = document.getElementById('address').value;
+document.getElementById('generate-all').onclick = () => {
+    if(!imageFiles.length) return alert("Pilih foto dulu bos!");
+    const container = document.getElementById('preview-container');
+    container.innerHTML = '<p style="text-align:center;">Memproses...</p>';
     
-    // CUSTOMIZATION PARAMS
-    const selectedTemplate = document.getElementById('templateStyle').value;
-    const userColor = document.getElementById('fontColor').value;
-    const scale = parseFloat(document.getElementById('fontSize').value);
-    const baseSize = (targetWidth / 20) * scale;
-
-    ctx.textAlign = "left";
-    ctx.shadowBlur = 4;
-    ctx.shadowColor = "rgba(0,0,0,0.5)";
-
-    let startX = targetWidth * 0.05;
-    let startY = targetHeight - (baseSize * 4);
-
-    // TEMPLATE LOGIC
-    if(selectedTemplate === "hacker_green") ctx.fillStyle = "#00ff00";
-    else if(selectedTemplate === "modern_blue") ctx.fillStyle = "#3b82f6";
-    else if(selectedTemplate === "orange_label") ctx.fillStyle = "#ff9800";
-    else ctx.fillStyle = userColor;
-
-    if(selectedTemplate === "minimal_bold") {
-        ctx.font = `900 ${baseSize * 2.5}px Inter`;
-        ctx.fillText(jam, startX, startY);
-        startY += (baseSize * 1.2);
-        ctx.font = `600 ${baseSize * 0.6}px Inter`;
-        ctx.fillText(`${hari}, ${tanggal}`, startX, startY);
-    } else {
-        // DEFAULT / CLASSIC STYLE
-        ctx.font = `bold ${baseSize * 2.2}px sans-serif`;
-        ctx.fillText(jam, startX, startY);
-        
-        let jamWidth = ctx.measureText(jam).width;
-        ctx.font = `bold ${baseSize * 0.7}px sans-serif`;
-        ctx.fillText(tanggal, startX + jamWidth + 15, startY - (baseSize * 0.8));
-        ctx.font = `${baseSize * 0.6}px sans-serif`;
-        ctx.fillText(hari, startX + jamWidth + 15, startY);
-    }
-
-    // DRAW ALAMAT
-    startY += (baseSize * 1);
-    ctx.font = `${baseSize * 0.45}px sans-serif`;
-    const words = alamat.split(' ');
-    let line = '';
-    for(let n = 0; n < words.length; n++) {
-        let testLine = line + words[n] + ' ';
-        if (ctx.measureText(testLine).width > targetWidth * 0.8) {
-            ctx.fillText(line, startX, startY);
-            line = words[n] + ' ';
-            startY += (baseSize * 0.6);
-        } else { line = testLine; }
-    }
-    ctx.fillText(line, startX, startY);
-
-    // DOWNLOAD LINK
-    const downloadArea = document.getElementById('download-area');
-    const link = document.createElement('a');
-    link.download = `BlackPearl_Stamp_${Date.now()}.jpg`;
-    link.href = canvas.toDataURL('image/jpeg', 0.9);
-    link.innerHTML = '<button class="btn-main" style="background:#10b981">💾 DOWNLOAD FOTO</button>';
-    downloadArea.innerHTML = '';
-    downloadArea.appendChild(link);
-    
-    canvas.scrollIntoView({ behavior: 'smooth' });
+    setTimeout(() => {
+        container.innerHTML = '';
+        imageFiles.forEach((file, i) => {
+            const reader = new FileReader();
+            reader.onload = (e) => drawImage(e.target.result, i);
+            reader.readAsDataURL(file);
+        });
+    }, 100);
 };
+
+function drawImage(src, index) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+        canvas.width = 1200; canvas.height = 1600;
+        const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+        const x = (canvas.width / 2) - (img.width / 2) * scale;
+        const y = (canvas.height / 2) - (img.height / 2) * scale;
+        
+        ctx.filter = `brightness(${document.getElementById('f-br').value}%) contrast(${document.getElementById('f-ct').value}%)`;
+        ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+        ctx.filter = 'none';
+
+        const timeInput = new Date(document.getElementById('t-time').value);
+        const txtJam = timeInput.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'});
+        const txtTgl = timeInput.toLocaleDateString('id-ID', {day:'2-digit', month:'short', year:'numeric'}).toUpperCase();
+        const txtAlamat = document.getElementById('address').value || "Location Unknown";
+        
+        applyTemplate(ctx, document.getElementById('t-style').value, document.getElementById('t-font').value, document.getElementById('t-color').value, txtJam, txtTgl, txtAlamat);
+
+        // Watermark Verified
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.font = "italic 25px Inter";
+        ctx.textAlign = 'right';
+        ctx.fillText("BlackPearl Verified", canvas.width - 40, canvas.height - 30);
+        ctx.textAlign = 'left';
+
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        div.innerHTML = `<a class="dl-btn" href="${canvas.toDataURL('image/jpeg', 0.9)}" download="BP_${index+1}.jpg">DOWNLOAD HASIL ${index+1}</a>`;
+        div.prepend(canvas);
+        document.getElementById('preview-container').appendChild(div);
+    };
+    img.src = src;
+}
+
+function applyTemplate(ctx, s, f, c, jam, tgl, alm) {
+    ctx.fillStyle = c;
+    ctx.shadowBlur = 12; ctx.shadowColor = "rgba(0,0,0,0.9)";
+    const margin = 60; const maxWidth = 1080;
+
+    const wrapText = (text, x, y, lineHeight, maxW) => {
+        let words = text.split(' '); let line = '';
+        for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            if (ctx.measureText(testLine).width > maxW && n > 0) {
+                ctx.fillText(line, x, y); line = words[n] + ' '; y += lineHeight;
+            } else { line = testLine; }
+        }
+        ctx.fillText(line, x, y);
+    };
+
+    if(s === 'polaroid') {
+        ctx.shadowBlur = 0; ctx.fillStyle = "white"; ctx.fillRect(0, 1300, 1200, 300);
+        ctx.fillStyle = "#111"; ctx.font = `bold 100px ${f}`; ctx.fillText(jam, margin, 1420);
+        ctx.font = `45px ${f}`; ctx.fillText(tgl, margin, 1480);
+        ctx.font = `30px ${f}`; wrapText(alm, margin, 1530, 40, maxWidth);
+    } else if(s === 'elegant') {
+        ctx.fillStyle = "rgba(0,0,0,0.7)"; ctx.fillRect(600, 1280, 550, 270);
+        ctx.fillStyle = c; ctx.font = `bold 90px ${f}`; ctx.fillText(jam, 630, 1380);
+        ctx.font = `bold 40px ${f}`; ctx.fillText(tgl, 630, 1430);
+        ctx.font = `26px ${f}`; wrapText(alm, 630, 1470, 35, 500);
+    } else {
+        ctx.font = `bold 110px ${f}`; ctx.fillText(jam, margin, 1400);
+        ctx.font = `bold 50px ${f}`; ctx.fillText(tgl, margin, 1470);
+        ctx.font = `32px ${f}`; wrapText(alm, margin, 1530, 45, maxWidth);
+    }
+}
 </script>
 </body>
 </html>
