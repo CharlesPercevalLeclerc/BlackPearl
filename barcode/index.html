@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlackPearl | Advanced Barcode & QR</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>BlackPearl | Scan & Generate Fix</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -13,187 +13,173 @@
     <style>
         :root {
             --bg-dark: #0a0a0c; --card-bg: #16161a; --accent: #3b82f6;
-            --text-main: #ffffff; --text-dim: #94a3b8; --danger: #ef4444;
+            --text-main: #ffffff; --text-dim: #94a3b8; --success: #10b981;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-dark); color: var(--text-main); padding: 20px; min-height: 100vh; }
-        body::before {
-            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 50% 0%, #1e293b 0%, transparent 70%); z-index: -1;
-        }
-        .container { width: 100%; max-width: 600px; margin: 60px auto; }
+        body { background-color: var(--bg-dark); color: var(--text-main); padding: 15px; min-height: 100vh; }
         
-        .nav-btn {
-            position: fixed; top: 20px; z-index: 1000; background: var(--card-bg); 
-            border: 1px solid #333; color: white; padding: 10px; border-radius: 12px;
-            cursor: pointer; display: flex; align-items: center; transition: 0.3s;
-        }
-        .btn-home { left: 20px; text-decoration: none; }
-        
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { font-size: 1.8rem; font-weight: 800; }
+        .container { width: 100%; max-width: 500px; margin: 30px auto; }
+        header { text-align: center; margin-bottom: 25px; }
+        header h1 { font-size: 1.8rem; font-weight: 900; letter-spacing: 2px; }
         header h1 span { color: var(--accent); }
 
-        .card { background: var(--card-bg); padding: 25px; border-radius: 24px; border: 1px solid #262626; margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-size: 0.75rem; font-weight: 600; color: var(--text-dim); text-transform: uppercase; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 20px; border: 1px solid #262626; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 10px; font-size: 0.75rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; }
         
+        /* Scanner UI */
+        #reader { width: 100%; border-radius: 12px; overflow: hidden; background: #000; display: none; margin-bottom: 10px; border: 1px solid #333 !important; }
+        .cam-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .btn-on { background: var(--success); color: white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold;}
+        .btn-off { background: #ef4444; color: white; border:none; padding:12px; border-radius:10px; cursor:pointer; font-weight:bold; display:none;}
+
         input, select {
-            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid #333;
+            width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #333;
             background: #0f0f12; color: white; font-size: 1rem; margin-bottom: 15px;
         }
 
-        /* Scanner Area */
-        #reader { width: 100%; border-radius: 15px; overflow: hidden; border: none !important; background: #000; }
-        #reader__dashboard_section_csr button { background: var(--accent) !important; color: white !important; border: none !important; padding: 10px !important; border-radius: 8px !important; }
-
-        .output-area {
-            background: white; padding: 20px; border-radius: 15px; margin: 20px 0;
-            display: none; justify-content: center; align-items: center; min-height: 150px;
+        /* Frame Putih Kontras */
+        .output-frame {
+            background: #ffffff; padding: 20px; border-radius: 12px;
+            margin: 15px 0; display: none; justify-content: center; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        #qrcode img { margin: 0 auto; }
+        
+        #qrcode img, #qrcode canvas, #barcodeCanvas { 
+            max-width: 100% !important; 
+            height: auto !important; 
+            margin: 0 auto; 
+            display: block;
+        }
 
         .btn-box { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         button {
-            padding: 14px; border: none; border-radius: 12px; cursor: pointer;
-            font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s;
+            padding: 15px; border: none; border-radius: 10px; cursor: pointer;
+            font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn-primary { background: var(--accent); color: white; grid-column: span 2; }
-        .btn-scan { background: #6366f1; color: white; grid-column: span 2; }
         .btn-sec { background: #334155; color: white; }
-        
-        footer { text-align: center; margin-top: 40px; font-size: 0.8rem; color: var(--text-dim); }
     </style>
 </head>
 <body>
 
-    <a href="../index.html" class="nav-btn btn-home"><i data-lucide="arrow-left"></i></a>
-
     <div class="container">
         <header>
-            <h1>BLACK<span>PEARL</span> TOOLS</h1>
-            <p>Scan, Generate Barcode & QR Code</p>
+            <h1>BLACK<span>PEARL</span> SCAN</h1>
+            <p style="color: var(--text-dim); font-size: 0.8rem;">PRO GENERATOR & SCANNER</p>
         </header>
 
         <div class="card">
-            <label><i data-lucide="camera"></i> Scan Barcode/QR via Kamera</label>
+            <label>Kamera Scanner</label>
+            <div class="cam-controls">
+                <button class="btn-on" id="start-cam" onclick="startScanner()">ON</button>
+                <button class="btn-off" id="stop-cam" onclick="stopScanner()">OFF</button>
+            </div>
             <div id="reader"></div>
-            <p id="scan-result" style="font-size: 0.8rem; color: #10b981; margin-top: 10px; text-align: center;"></p>
+            <p id="scan-result" style="text-align:center; color:#10b981; font-weight:bold;"></p>
         </div>
 
         <div class="card">
-            <div class="input-group">
-                <label>Input Data (Teks/Angka)</label>
-                <input type="text" id="inputText" placeholder="Ketik atau hasil scan otomatis ke sini...">
-                
-                <label>Pilih Format</label>
-                <select id="formatType">
-                    <option value="QR">QR Code</option>
-                    <option value="CODE128">Barcode (CODE128)</option>
-                    <option value="EAN13">Barcode (EAN13 - Angka Saja)</option>
-                    <option value="UPC">Barcode (UPC - Angka Saja)</option>
-                </select>
-            </div>
+            <label>Input Data</label>
+            <input type="text" id="inputText" placeholder="Input teks...">
+            
+            <label>Format</label>
+            <select id="formatType">
+                <option value="QR">QR Code</option>
+                <option value="CODE128">Barcode CODE128</option>
+            </select>
 
-            <div class="output-area" id="outputArea">
+            <div class="output-frame" id="outputArea">
                 <div id="qrcode"></div>
-                <canvas id="barcodeCanvas" style="display:none;"></canvas>
+                <canvas id="barcodeCanvas"></canvas>
             </div>
 
             <div class="btn-box">
-                <button class="btn-primary" onclick="processGenerate()">
-                    <i data-lucide="refresh-cw"></i> GENERATE SEKARANG
-                </button>
-                <button class="btn-sec" onclick="downloadResult()">
-                    <i data-lucide="download"></i> DOWNLOAD
-                </button>
-                <button class="btn-sec" style="color: var(--danger);" onclick="resetAll()">
-                    <i data-lucide="trash-2"></i> RESET
-                </button>
+                <button class="btn-primary" onclick="processGenerate()">GENERATE SEKARANG</button>
+                <button class="btn-sec" onclick="downloadResult()">DOWNLOAD PNG</button>
+                <button class="btn-sec" onclick="location.reload()">RESET</button>
             </div>
         </div>
-
-        <footer>BlackPearl System &copy; 2026</footer>
     </div>
 
     <script>
         lucide.createIcons();
-
-        // --- SCANNER LOGIC ---
         const html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
-        html5QrCode.start({ facingMode: "environment" }, config, (decodedText) => {
-            document.getElementById('inputText').value = decodedText;
-            document.getElementById('scan-result').innerText = "Berhasil scan: " + decodedText;
-            // Getaran feedback jika didukung HP
-            if (navigator.vibrate) navigator.vibrate(100);
-        });
+        function startScanner() {
+            document.getElementById('reader').style.display = "block";
+            document.getElementById('start-cam').style.display = "none";
+            document.getElementById('stop-cam').style.display = "block";
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+                document.getElementById('inputText').value = text;
+                stopScanner();
+            });
+        }
 
-        // --- GENERATOR LOGIC ---
+        function stopScanner() {
+            html5QrCode.stop().then(() => {
+                document.getElementById('reader').style.display = "none";
+                document.getElementById('start-cam').style.display = "block";
+                document.getElementById('stop-cam').style.display = "none";
+            }).catch(() => {});
+        }
+
         function processGenerate() {
             const text = document.getElementById('inputText').value;
             const format = document.getElementById('formatType').value;
             const outputArea = document.getElementById('outputArea');
             const qrDiv = document.getElementById('qrcode');
-            const canvas = document.getElementById('barcodeCanvas');
+            const barCanvas = document.getElementById('barcodeCanvas');
 
-            if (!text) return alert("Input kosong!");
+            if (!text) return alert("Kosong!");
 
             outputArea.style.display = "flex";
-            qrDiv.innerHTML = ""; // Bersihkan QR sebelumnya
-            canvas.style.display = "none";
+            qrDiv.innerHTML = ""; 
 
             if (format === "QR") {
+                barCanvas.style.display = "none";
                 qrDiv.style.display = "block";
-                new QRCode(qrDiv, {
-                    text: text,
-                    width: 200,
-                    height: 200,
-                    colorDark : "#000000",
-                    colorLight : "#ffffff",
-                });
+                new QRCode(qrDiv, { text: text, width: 400, height: 400 });
             } else {
                 qrDiv.style.display = "none";
-                canvas.style.display = "block";
-                try {
-                    JsBarcode("#barcodeCanvas", text, {
-                        format: format,
-                        lineColor: "#000",
-                        width: 2,
-                        height: 80,
-                        displayValue: true
-                    });
-                } catch (e) {
-                    alert("Gagal: Input tidak cocok dengan format " + format);
-                }
+                barCanvas.style.display = "block";
+                // FIX: Pakai background putih agar tidak transparan/blank
+                JsBarcode("#barcodeCanvas", text, {
+                    format: format,
+                    lineColor: "#000",
+                    background: "#fff",
+                    width: 2,
+                    height: 100,
+                    displayValue: true
+                });
             }
         }
 
         function downloadResult() {
             const format = document.getElementById('formatType').value;
-            let dataUrl, name;
+            const outputArea = document.getElementById('outputArea');
+            if (outputArea.style.display === "none") return alert("Generate dulu!");
+
+            const finalCanvas = document.createElement('canvas');
+            const ctx = finalCanvas.getContext('2d');
 
             if (format === "QR") {
-                const img = document.querySelector("#qrcode img");
-                if (!img) return alert("Generate dulu!");
-                dataUrl = img.src;
-                name = "qrcode.png";
+                const qrSource = document.querySelector("#qrcode canvas") || document.querySelector("#qrcode img");
+                finalCanvas.width = 500; finalCanvas.height = 500;
+                ctx.fillStyle = "white"; ctx.fillRect(0,0,500,500);
+                ctx.drawImage(qrSource, 50, 50, 400, 400);
             } else {
-                const canvas = document.getElementById('barcodeCanvas');
-                dataUrl = canvas.toDataURL("image/png");
-                name = "barcode.png";
+                const bCanvas = document.getElementById('barcodeCanvas');
+                // FIX: Ambil ukuran canvas asli barcode + padding
+                finalCanvas.width = bCanvas.width + 60;
+                finalCanvas.height = bCanvas.height + 60;
+                ctx.fillStyle = "white"; ctx.fillRect(0,0,finalCanvas.width,finalCanvas.height);
+                ctx.drawImage(bCanvas, 30, 30);
             }
 
             const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = name;
+            link.href = finalCanvas.toDataURL("image/png");
+            link.download = "BlackPearl_Code.png";
             link.click();
-        }
-
-        function resetAll() {
-            document.getElementById('inputText').value = "";
-            document.getElementById('outputArea').style.display = "none";
-            document.getElementById('scan-result').innerText = "";
         }
     </script>
 </body>
