@@ -6,118 +6,44 @@
     <title>BlackPearl | IDM Inventory Scan</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    
     <link rel="stylesheet" href="../style.css">
 
     <style>
-        /* Penyesuaian khusus untuk halaman barcode agar tetap matching */
         body { padding: 20px; }
         .tool-container { max-width: 500px; margin: 0 auto; }
-        
-        .card { 
-            background: var(--card-bg); 
-            padding: 25px; 
-            border-radius: 20px; 
-            border: 1px solid #262626; 
-            margin-bottom: 20px; 
-        }
+        .card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid #262626; margin-bottom: 20px; }
+        label { display: block; margin-bottom: 12px; font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
-        label { 
-            display: block; 
-            margin-bottom: 12px; 
-            font-size: 0.7rem; 
-            font-weight: 800; 
-            color: var(--text-dim); 
-            text-transform: uppercase; 
-            letter-spacing: 1px;
-        }
-
-        /* Scanner UI */
-        #reader { 
-            width: 100%; 
-            border-radius: 15px; 
-            overflow: hidden; 
-            background: #000; 
-            display: none; 
-            margin-bottom: 15px; 
-            border: 1px solid #333 !important; 
-        }
-        
+        /* Scanner */
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; display: none; margin-bottom: 15px; border: 1px solid #333 !important; }
         .cam-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .btn-cam { padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: 800; font-size: 0.8rem; }
         #start-cam { background: #10b981; color: white; }
         #stop-cam { background: #ef4444; color: white; display: none; }
 
-        /* Search Input */
-        .search-wrapper { position: relative; margin-bottom: 15px; }
-        input {
-            width: 100%; 
-            padding: 16px; 
-            border-radius: 12px; 
-            border: 1px solid #333;
-            background: #0f0f12; 
-            color: white; 
-            font-size: 1rem; 
-            outline: none;
-            transition: 0.3s;
-        }
-        input:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2); }
+        /* Search */
+        input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; background: #0f0f12; color: white; font-size: 1rem; outline: none; }
+        input:focus { border-color: var(--accent); }
 
-        /* Search Results */
-        #search-results { max-height: 300px; overflow-y: auto; margin-top: 10px; }
-        .result-item {
-            background: rgba(255,255,255,0.03); 
-            padding: 12px; 
-            border-radius: 12px; 
-            margin-bottom: 8px;
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            gap: 15px;
-            border: 1px solid transparent;
-            transition: 0.2s;
-        }
-        .result-item:hover { background: rgba(255,255,255,0.08); border-color: var(--accent); }
+        /* Results */
+        #search-results { max-height: 250px; overflow-y: auto; margin-top: 10px; }
+        .result-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 15px; border: 1px solid transparent; }
+        .result-item:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
         .result-item img { width: 45px; height: 45px; border-radius: 8px; background: white; object-fit: contain; }
-        .result-info .p-name { font-size: 0.85rem; font-weight: 600; color: #fff; margin-bottom: 2px; }
-        .result-info .p-plu { font-size: 0.75rem; color: var(--accent); font-weight: 800; }
 
-        /* Output Barcode */
-        .barcode-display {
-            background: #fff; 
-            padding: 25px; 
-            border-radius: 15px; 
-            margin: 20px 0; 
-            display: none; 
-            flex-direction: column; 
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+        /* Detail Area */
+        .product-detail-card { text-align: center; margin-bottom: 20px; }
+        .big-image { width: 150px; height: 150px; background: white; border-radius: 15px; padding: 10px; object-fit: contain; margin: 0 auto 15px; display: block; }
+        
+        .barcode-display { background: #fff; padding: 25px; border-radius: 15px; margin: 20px 0; display: none; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #barcodeCanvas { max-width: 100%; height: auto; }
-        .barcode-meta { color: #000; font-weight: 800; font-size: 0.7rem; margin-top: 10px; text-transform: uppercase; }
+        .barcode-meta { color: #000; font-weight: 800; font-size: 0.75rem; margin-top: 10px; font-family: monospace; }
 
-        .back-home {
-            display: inline-flex; 
-            align-items: center; 
-            gap: 8px;
-            color: var(--text-dim); 
-            text-decoration: none; 
-            font-size: 0.85rem; 
-            margin-bottom: 25px;
-            transition: 0.3s;
-        }
-        .back-home:hover { color: var(--accent); }
-
-        .btn-action {
-            width: 100%; padding: 15px; border: none; border-radius: 12px;
-            font-weight: 800; cursor: pointer; transition: 0.3s;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-        }
+        .back-home { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); text-decoration: none; font-size: 0.85rem; margin-bottom: 25px; }
+        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-save { background: var(--accent); color: white; margin-bottom: 10px; }
-        .btn-reset { background: #334155; color: white; }
     </style>
 </head>
 <body>
@@ -125,37 +51,35 @@
     <div class="overlay"></div>
 
     <div class="tool-container">
-        <a href="../index.html" class="back-home">
-            <i data-lucide="arrow-left" size="18"></i> Back to Dashboard
-        </a>
+        <a href="../index.html" class="back-home"><i data-lucide="arrow-left" size="18"></i> Back to Dashboard</a>
 
         <header style="text-align: center; margin-bottom: 30px;">
             <div class="logo">BLACK<span>PEARL</span></div>
-            <p style="color: var(--text-dim); font-size: 0.8rem; margin-top: 5px; letter-spacing: 1px;">IDM HELP & SCANNER SYSTEM</p>
+            <p style="color: var(--text-dim); font-size: 0.7rem; letter-spacing: 1px;">IDM QTY GENERATOR</p>
         </header>
 
         <div class="card">
-            <label><i data-lucide="camera" size="12"></i> Kamera Scanner</label>
+            <label>Kamera Scanner</label>
             <div class="cam-controls">
-                <button id="start-cam" class="btn-cam" onclick="startScanner()">AKTIFKAN KAMERA</button>
-                <button id="stop-cam" class="btn-cam" onclick="stopScanner()">MATIKAN</button>
+                <button id="start-cam" class="btn-cam" onclick="startScanner()">ON</button>
+                <button id="stop-cam" class="btn-cam" onclick="stopScanner()">OFF</button>
             </div>
             <div id="reader"></div>
         </div>
 
         <div class="card">
-            <label><i data-lucide="search" size="12"></i> Cari Produk</label>
-            <div class="search-wrapper">
-                <input type="text" id="searchInput" placeholder="Ketik Nama, PLU, atau Barcode..." oninput="doSearch(this.value)">
-            </div>
-            
+            <label>Cari Produk</label>
+            <input type="text" id="searchInput" placeholder="Nama atau PLU..." oninput="doSearch(this.value)">
             <div id="search-results"></div>
 
             <div id="detail-area" style="display: none; border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
-                <label>Produk Terpilih</label>
-                <div id="selected-info" style="margin-bottom: 20px;"></div>
+                <div class="product-detail-card">
+                    <img id="detail-img" class="big-image" src="" alt="Produk">
+                    <div id="selected-info" style="font-weight: 800; color: var(--accent); font-size: 1.1rem;"></div>
+                    <div id="selected-plu" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 5px;"></div>
+                </div>
                 
-                <label>Input QTY</label>
+                <label>Jumlah (QTY)</label>
                 <input type="number" id="qtyInput" value="1" min="1" oninput="generateFinalBarcode()">
 
                 <div class="barcode-display" id="barcodeDisplay">
@@ -164,51 +88,35 @@
                 </div>
 
                 <button class="btn-action btn-save" onclick="downloadBarcode()">
-                    <i data-lucide="download" size="18"></i> SIMPAN KE GALERI
-                </button>
-                <button class="btn-action btn-reset" onclick="resetApp()">
-                    <i data-lucide="refresh-cw" size="18"></i> RESET
+                    <i data-lucide="download" size="18"></i> SIMPAN BARCODE
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Jalankan Lucide Icons
         lucide.createIcons();
-
         const html5QrCode = new Html5Qrcode("reader");
         let database = [];
         let activeProduct = null;
 
-        // 1. Load Data dari JSON (Pake Async/Await)
         async function initData() {
             try {
-                // Tambahkan cache breaker agar data selalu fresh saat didevelop
                 const response = await fetch('barcode-db.json?v=' + Date.now());
                 database = await response.json();
-                console.log("Database Ready. Total:", database.length);
-            } catch (err) {
-                console.error("Gagal load database:", err);
-            }
+            } catch (err) { console.error("Database error"); }
         }
         initData();
 
-        // 2. Scanner Logic
         function startScanner() {
             document.getElementById('reader').style.display = "block";
             document.getElementById('start-cam').style.display = "none";
             document.getElementById('stop-cam').style.display = "block";
-            
-            html5QrCode.start(
-                { facingMode: "environment" }, 
-                { fps: 10, qrbox: { width: 250, height: 250 } },
-                (decodedText) => {
-                    document.getElementById('searchInput').value = decodedText;
-                    doSearch(decodedText);
-                    stopScanner();
-                }
-            ).catch(err => alert("Kamera Error: " + err));
+            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (decodedText) => {
+                document.getElementById('searchInput').value = decodedText;
+                doSearch(decodedText);
+                stopScanner();
+            });
         }
 
         function stopScanner() {
@@ -219,21 +127,14 @@
             });
         }
 
-        // 3. Search Logic
         function doSearch(val) {
             const resultsBox = document.getElementById('search-results');
             const query = val.toLowerCase().trim();
+            if (query.length < 2) { resultsBox.innerHTML = ""; return; }
 
-            if (query.length < 2) {
-                resultsBox.innerHTML = "";
-                return;
-            }
-
-            // Filter sakti: cari di semua field (plu, name, barcode)
-            const filtered = database.filter(item => {
-                const searchString = `${item.name} ${item.plu} ${item.barcode}`.toLowerCase();
-                return searchString.includes(query);
-            }).slice(0, 5); // Ambil 5 teratas biar gak kepenuhan
+            const filtered = database.filter(item => 
+                `${item.name} ${item.plu}`.toLowerCase().includes(query)
+            ).slice(0, 5);
 
             resultsBox.innerHTML = filtered.map(item => `
                 <div class="result-item" onclick="selectItem('${item.plu}')">
@@ -246,19 +147,18 @@
             `).join('');
         }
 
-        // 4. Detail & Barcode Generate
         function selectItem(plu) {
             activeProduct = database.find(i => i.plu == plu);
             if (!activeProduct) return;
 
-            // Update UI
             document.getElementById('search-results').innerHTML = "";
             document.getElementById('searchInput').value = activeProduct.name;
             document.getElementById('detail-area').style.display = "block";
-            document.getElementById('selected-info').innerHTML = `
-                <div style="font-size: 1.1rem; font-weight: 800; color: var(--accent);">${activeProduct.name}</div>
-                <div style="font-size: 0.8rem; color: var(--text-dim);">Barcode Ori: ${activeProduct.barcode}</div>
-            `;
+            
+            // Tampilkan Gambar & Info
+            document.getElementById('detail-img').src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}_1.jpg`;
+            document.getElementById('selected-info').innerText = activeProduct.name;
+            document.getElementById('selected-plu').innerText = "PLU: " + activeProduct.plu;
 
             generateFinalBarcode();
         }
@@ -267,50 +167,39 @@
             if (!activeProduct) return;
             
             const qtyInput = document.getElementById('qtyInput').value || 1;
-            const barcodeBase = activeProduct.barcode || activeProduct.plu;
-            
-            // Format: Barcode Utama + 3 digit QTY (Contoh: 899...001)
-            const finalString = barcodeBase + qtyInput.toString().padStart(3, '0');
+            // REVISI LOGIKA: B + PLU + 4 Digit QTY
+            const finalString = "B" + activeProduct.plu + qtyInput.toString().padStart(4, '0');
             
             document.getElementById('barcodeDisplay').style.display = "flex";
-            document.getElementById('barcodeText').innerText = `KODE: ${barcodeBase} | QTY: ${qtyInput}`;
+            document.getElementById('barcodeText').innerText = finalString;
 
             JsBarcode("#barcodeCanvas", finalString, {
                 format: "CODE128",
                 lineColor: "#000",
                 width: 2,
                 height: 80,
-                displayValue: true,
-                fontSize: 14,
-                font: "Inter"
+                displayValue: false
             });
         }
 
-        // 5. Download PNG
         function downloadBarcode() {
             const canvas = document.getElementById('barcodeCanvas');
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
-            
-            // Beri padding putih supaya bagus pas diprint
             finalCanvas.width = canvas.width + 60;
             finalCanvas.height = canvas.height + 80;
-            
             ctx.fillStyle = "white";
             ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-            ctx.drawImage(canvas, 30, 30);
+            ctx.drawImage(canvas, 30, 20);
+            ctx.fillStyle = "black";
+            ctx.font = "bold 16px Monospace";
+            ctx.textAlign = "center";
+            ctx.fillText(document.getElementById('barcodeText').innerText, finalCanvas.width/2, finalCanvas.height - 20);
             
             const link = document.createElement('a');
             link.href = finalCanvas.toDataURL("image/png");
-            link.download = `BP_IDM_${activeProduct.plu}_QTY.png`;
+            link.download = `${document.getElementById('barcodeText').innerText}.png`;
             link.click();
-        }
-
-        function resetApp() {
-            document.getElementById('detail-area').style.display = "none";
-            document.getElementById('barcodeDisplay').style.display = "none";
-            document.getElementById('searchInput').value = "";
-            activeProduct = null;
         }
     </script>
 </body>
