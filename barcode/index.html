@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="referrer" content="no-referrer">
-    <title>BlackPearl | Barcode Converter</title>
+    <title>BlackPearl | Generator Barcode Indomaret</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -13,13 +13,13 @@
     <link rel="stylesheet" href="../style.css">
 
     <style>
-        body { padding: 20px; }
-        .tool-container { max-width: 500px; margin: 0 auto; }
+        body { padding: 20px; scroll-behavior: smooth; }
+        .tool-container { max-width: 500px; margin: 0 auto; padding-bottom: 80px; }
         .card { background: var(--card-bg); padding: 25px; border-radius: 20px; border: 1px solid #262626; margin-bottom: 20px; }
         label { display: block; margin-bottom: 12px; font-size: 0.7rem; font-weight: 800; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
 
         .mode-switch { display: grid; grid-template-columns: 1fr 1fr; background: #0f0f12; padding: 5px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #333; }
-        .mode-btn { padding: 10px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 0.75rem; transition: 0.3s; }
+        .mode-btn { padding: 12px; border: none; border-radius: 8px; background: transparent; color: var(--text-dim); cursor: pointer; font-weight: 800; font-size: 0.75rem; transition: 0.3s; }
         .mode-btn.active { background: var(--accent); color: white; }
 
         #reader { width: 100%; border-radius: 15px; overflow: hidden; background: #000; display: none; margin-bottom: 15px; border: 1px solid #333 !important; }
@@ -37,13 +37,20 @@
 
         .product-detail-card { text-align: center; margin-bottom: 20px; }
         .big-image { width: 150px; height: 150px; background: white; border-radius: 15px; padding: 10px; object-fit: contain; margin: 0 auto 15px; display: block; }
-        .barcode-display { background: #fff; padding: 25px; border-radius: 15px; margin: 20px 0; display: none; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        
+        /* Barcode Preview Styling */
+        .barcode-display { background: #fff; padding: 20px; border-radius: 15px; margin: 20px 0; display: none; flex-direction: column; align-items: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         #barcodeCanvas { max-width: 100%; height: auto; }
-        .barcode-meta { color: #000; font-weight: 800; font-size: 0.8rem; margin-top: 10px; font-family: monospace; }
+        .barcode-footer-text { color: #000; font-weight: 900; font-size: 0.85rem; margin-top: 5px; font-family: 'Courier New', monospace; }
 
-        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-action { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-save { background: var(--accent); color: white; margin-bottom: 10px; }
         .btn-reset { background: #334155; color: white; }
+
+        /* Back to Top Button */
+        #backToTop { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; width: 45px; height: 45px; border-radius: 50%; border: none; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); z-index: 100; transition: 0.3s; }
+        #backToTop:hover { transform: translateY(-5px); }
+
         .back-home { display: inline-flex; align-items: center; gap: 8px; color: var(--text-dim); text-decoration: none; font-size: 0.85rem; margin-bottom: 20px; }
     </style>
 </head>
@@ -54,56 +61,60 @@
 
         <header style="text-align: center; margin-bottom: 30px;">
             <div class="logo">BLACK<span>PEARL</span></div>
-            <p style="color: var(--text-dim); font-size: 0.7rem;">IDM MULTI-BARCODE GENERATOR</p>
+            <p style="color: var(--text-dim); font-size: 0.75rem; letter-spacing: 1px; font-weight: 800;">GENERATOR BARCODE INDOMARET</p>
         </header>
 
         <div class="card">
-            <label>Pilih Mode</label>
+            <label>Mode Input</label>
             <div class="mode-switch">
-                <button id="mode-db" class="mode-btn active" onclick="switchMode('db')">DATABASE (QTY)</button>
-                <button id="mode-manual" class="mode-btn" onclick="switchMode('manual')">MANUAL (PURE)</button>
+                <button id="mode-db" class="mode-btn active" onclick="switchMode('db')">CARI PRODUK</button>
+                <button id="mode-manual" class="mode-btn" onclick="switchMode('manual')">INPUT MANUAL</button>
             </div>
 
             <div id="section-db">
-                <label>Scanner Kamera</label>
+                <label>Scanner Barcode</label>
                 <div class="cam-controls">
-                    <button id="start-cam" class="btn-cam" onclick="startScanner()">ON</button>
-                    <button id="stop-cam" class="btn-cam" onclick="stopScanner()">OFF</button>
+                    <button id="start-cam" class="btn-cam" onclick="startScanner()">AKTIFKAN KAMERA</button>
+                    <button id="stop-cam" class="btn-cam" onclick="stopScanner()">MATIKAN</button>
                 </div>
                 <div id="reader"></div>
                 
-                <label>Cari Produk</label>
-                <input type="text" id="searchInput" placeholder="Ketik Nama atau PLU..." oninput="doSearch(this.value)">
+                <label>Pencarian</label>
+                <input type="text" id="searchInput" placeholder="Ketik Nama, PLU, atau EAN..." oninput="doSearch(this.value)">
                 <div id="search-results"></div>
             </div>
 
             <div id="section-manual" style="display: none;">
-                <label>Input Barcode Manual</label>
-                <input type="text" id="manualInput" placeholder="Ketik angka/teks bebas..." oninput="handleManualInput()">
+                <label>Input Manual</label>
+                <input type="text" id="manualInput" placeholder="Masukkan angka/kode bebas..." oninput="handleManualInput()">
             </div>
 
             <div id="detail-area" style="display: none; border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
                 <div id="product-info-box" class="product-detail-card">
                     <img id="detail-img" class="big-image" src="" alt="Produk">
-                    <div id="selected-info" style="font-weight: 800; color: var(--accent); font-size: 1.1rem;"></div>
-                    <div id="selected-plu" style="font-size: 0.8rem; color: var(--text-dim); margin-top: 5px;"></div>
+                    <div id="selected-info" style="font-weight: 900; color: var(--accent); font-size: 1.1rem; text-transform: uppercase;"></div>
+                    <div id="selected-plu" style="font-size: 0.8rem; color: #fff; margin-top: 5px; font-weight: 600;"></div>
+                    <div id="selected-ean" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;"></div>
                 </div>
                 
                 <div id="qty-wrapper">
-                    <label>Jumlah (QTY)</label>
+                    <label>Setting QTY</label>
                     <input type="number" id="qtyInput" value="1" min="1" oninput="generateFinalBarcode()">
                 </div>
 
                 <div class="barcode-display" id="barcodeDisplay">
+                    <div id="output-product-name" style="color:black; font-weight:900; font-size:12px; text-align:center; margin-bottom:5px; width: 100%;"></div>
                     <canvas id="barcodeCanvas"></canvas>
-                    <div id="barcodeText" class="barcode-meta"></div>
+                    <div id="barcodeText" class="barcode-footer-text"></div>
                 </div>
 
-                <button class="btn-action btn-save" onclick="downloadBarcode()"><i data-lucide="download" size="18"></i> SIMPAN</button>
+                <button class="btn-action btn-save" onclick="downloadBarcode()"><i data-lucide="download" size="18"></i> SIMPAN BARCODE</button>
                 <button class="btn-action btn-reset" onclick="resetApp()"><i data-lucide="refresh-cw" size="18"></i> RESET</button>
             </div>
         </div>
     </div>
+
+    <button id="backToTop" onclick="scrollToTop()"><i data-lucide="chevron-up"></i></button>
 
     <script>
         lucide.createIcons();
@@ -114,7 +125,7 @@
             try {
                 const response = await fetch('barcode-db.json?v=' + Date.now());
                 database = await response.json();
-            } catch (err) { console.error("Database loading failed"); }
+            } catch (err) { console.error("Database failed to load."); }
         }
         initData();
 
@@ -127,16 +138,15 @@
             document.getElementById('section-manual').style.display = mode === 'manual' ? 'block' : 'none';
         }
 
-        // DB Functions
         function startScanner() {
             document.getElementById('reader').style.display = "block";
             document.getElementById('start-cam').style.display = "none";
             document.getElementById('stop-cam').style.display = "block";
-            html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, (text) => {
+            html5QrCode.start({ facingMode: "environment" }, { fps: 15, qrbox: 250 }, (text) => {
                 document.getElementById('searchInput').value = text;
-                doSearch(text);
+                doSearch(text); // Otomatis trigger pencarian setelah scan
                 stopScanner();
-            });
+            }).catch(err => console.error(err));
         }
 
         function stopScanner() {
@@ -151,13 +161,18 @@
             const resultsBox = document.getElementById('search-results');
             const query = val.toLowerCase().trim();
             if (query.length < 2) { resultsBox.innerHTML = ""; return; }
-            const filtered = database.filter(item => `${item.name} ${item.plu}`.toLowerCase().includes(query)).slice(0, 5);
+
+            // Cari di Nama, PLU, atau Barcode EAN
+            const filtered = database.filter(item => 
+                `${item.name} ${item.plu} ${item.barcode}`.toLowerCase().includes(query)
+            ).slice(0, 5);
+
             resultsBox.innerHTML = filtered.map(item => `
                 <div class="result-item" onclick="selectItem('${item.plu}')">
                     <img src="https://cdn-klik.klikindomaret.com/klik-catalog/product/${item.plu}_1.jpg" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
                     <div class="result-info">
-                        <div class="p-name">${item.name}</div>
-                        <div class="p-plu">PLU: ${item.plu}</div>
+                        <div class="p-name" style="font-weight:700;">${item.name}</div>
+                        <div class="p-plu" style="font-size:0.7rem; color:var(--accent);">PLU: ${item.plu}</div>
                     </div>
                 </div>
             `).join('');
@@ -166,20 +181,26 @@
         function selectItem(plu) {
             activeProduct = database.find(i => i.plu == plu);
             if (!activeProduct) return;
+            
             document.getElementById('detail-area').style.display = "block";
             document.getElementById('qty-wrapper').style.display = "block";
             document.getElementById('product-info-box').style.display = "block";
-            document.getElementById('detail-img').src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}_1.jpg`;
+            document.getElementById('search-results').innerHTML = "";
+
+            const imgElement = document.getElementById('detail-img');
+            imgElement.src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}_1.jpg`;
+            
             document.getElementById('selected-info').innerText = activeProduct.name;
             document.getElementById('selected-plu').innerText = "PLU: " + activeProduct.plu;
+            document.getElementById('selected-ean').innerText = "EAN: " + (activeProduct.barcode || "-");
+
             generateFinalBarcode();
         }
 
-        // Manual Function
         function handleManualInput() {
             const val = document.getElementById('manualInput').value;
             if (val.length > 0) {
-                activeProduct = { manualCode: val };
+                activeProduct = { name: "MANUAL", plu: val, barcode: val };
                 document.getElementById('detail-area').style.display = "block";
                 document.getElementById('qty-wrapper').style.display = "none";
                 document.getElementById('product-info-box').style.display = "none";
@@ -189,52 +210,76 @@
             }
         }
 
-        // Generator Core
         function generateFinalBarcode() {
             if (!activeProduct) return;
             let finalString = "";
+            let footerText = "";
 
             if (currentMode === 'db') {
                 const qty = document.getElementById('qtyInput').value || 1;
                 finalString = "B" + activeProduct.plu + qty.toString().padStart(4, '0');
+                footerText = finalString;
+                document.getElementById('output-product-name').innerText = activeProduct.name + " (" + qty + ")";
             } else {
-                // Murni tanpa embel-embel
-                finalString = activeProduct.manualCode;
+                finalString = activeProduct.plu; // Pure manual
+                footerText = finalString;
+                document.getElementById('output-product-name').innerText = "MANUAL INPUT";
             }
 
             document.getElementById('barcodeDisplay').style.display = "flex";
-            document.getElementById('barcodeText').innerText = finalString;
+            document.getElementById('barcodeText').innerText = footerText;
             
-            try {
-                JsBarcode("#barcodeCanvas", finalString, { 
-                    format: "CODE128", 
-                    lineColor: "#000", 
-                    width: 2, 
-                    height: 80, 
-                    displayValue: false 
-                });
-            } catch(e) {
-                console.error("Barcode generation failed");
-            }
+            JsBarcode("#barcodeCanvas", finalString, { 
+                format: "CODE128", 
+                lineColor: "#000", 
+                width: 2, 
+                height: 70, 
+                displayValue: false 
+            });
         }
 
         function downloadBarcode() {
             const canvas = document.getElementById('barcodeCanvas');
             const finalCanvas = document.createElement('canvas');
             const ctx = finalCanvas.getContext('2d');
-            finalCanvas.width = canvas.width + 60; 
-            finalCanvas.height = canvas.height + 80;
-            ctx.fillStyle = "white"; 
-            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
-            ctx.drawImage(canvas, 30, 20);
-            ctx.fillStyle = "black"; 
-            ctx.font = "bold 16px Monospace"; 
-            ctx.textAlign = "center";
-            ctx.fillText(document.getElementById('barcodeText').innerText, finalCanvas.width/2, finalCanvas.height - 20);
             
+            finalCanvas.width = 400;
+            finalCanvas.height = 250;
+            
+            // Background Putih
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, finalCanvas.width, finalCanvas.height);
+            
+            // Text Atas (Nama & PLU)
+            ctx.fillStyle = "black";
+            ctx.font = "bold 14px Inter";
+            ctx.textAlign = "center";
+            const displayName = currentMode === 'db' ? activeProduct.name : "MANUAL INPUT";
+            ctx.fillText(displayName, 200, 40);
+            
+            ctx.font = "12px Inter";
+            const subText = currentMode === 'db' ? "PLU: " + activeProduct.plu + " | QTY: " + document.getElementById('qtyInput').value : "MANUAL";
+            ctx.fillText(subText, 200, 60);
+
+            // Draw Barcode (Tengah)
+            // Kalkulasi posisi agar center
+            const bWidth = canvas.width;
+            ctx.drawImage(canvas, (400 - bWidth)/2, 80);
+            
+            // Text Bawah (Nomor Barcode Hasil & EAN Asli)
+            ctx.font = "bold 16px Monospace";
+            ctx.fillText(document.getElementById('barcodeText').innerText, 200, 180);
+            
+            ctx.font = "10px Inter";
+            const eanText = currentMode === 'db' ? "EAN ORI: " + (activeProduct.barcode || "-") : "";
+            ctx.fillText(eanText, 200, 210);
+            
+            ctx.font = "italic 9px Inter";
+            ctx.fillText("Generated by BlackPearl", 200, 235);
+
             const link = document.createElement('a');
             link.href = finalCanvas.toDataURL("image/png");
-            link.download = `BP_${document.getElementById('barcodeText').innerText}.png`;
+            link.download = `BARCODE_${activeProduct.plu}.png`;
             link.click();
         }
 
@@ -245,6 +290,20 @@
             document.getElementById('manualInput').value = "";
             document.getElementById('search-results').innerHTML = "";
             activeProduct = null;
+        }
+
+        // Back to Top Logic
+        window.onscroll = function() {
+            const btn = document.getElementById("backToTop");
+            if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+                btn.style.display = "flex";
+            } else {
+                btn.style.display = "none";
+            }
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
