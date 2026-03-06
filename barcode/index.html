@@ -30,8 +30,12 @@
 
         input { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; background: #0f0f12; color: white; font-size: 1rem; outline: none; }
         input:focus { border-color: var(--accent); }
-        #search-results { max-height: 250px; overflow-y: auto; margin-top: 10px; }
-        .result-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 15px; border: 1px solid transparent; }
+        
+        #search-results { max-height: 400px; overflow-y: auto; margin-top: 10px; scrollbar-width: thin; scrollbar-color: var(--accent) transparent; }
+        #search-results::-webkit-scrollbar { width: 6px; }
+        #search-results::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        .result-item { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; margin-bottom: 8px; cursor: pointer; display: flex; align-items: center; gap: 15px; border: 1px solid transparent; transition: 0.2s; }
         .result-item:hover { border-color: var(--accent); background: rgba(255,255,255,0.08); }
         .result-item img { width: 45px; height: 45px; border-radius: 8px; background: white; object-fit: contain; }
 
@@ -155,20 +159,22 @@
             });
         }
 
-        
         function doSearch(val) {
             const resultsBox = document.getElementById('search-results');
             const query = val.toLowerCase().trim();
             if (query.length < 2) { resultsBox.innerHTML = ""; return; }
 
-            // Pecah input jadi array kata (tokens)
             const tokens = query.split(/\s+/).filter(t => t.length > 0);
 
             const filtered = database.filter(item => {
                 const targetString = `${item.name} ${item.plu} ${item.barcode}`.toLowerCase();
-                // Cek apakah SETIAP token ada di dalam nama/plu/barcode
                 return tokens.every(token => targetString.includes(token));
-            }).slice(0, 5);
+            });
+
+            if (filtered.length === 0) {
+                resultsBox.innerHTML = `<div style="padding:15px; text-align:center; color:var(--text-dim); font-size:0.8rem;">Produk tidak ditemukan...</div>`;
+                return;
+            }
 
             resultsBox.innerHTML = filtered.map(item => `
                 <div class="result-item" onclick="selectItem('${item.plu}')">
@@ -180,7 +186,6 @@
                 </div>
             `).join('');
         }
-        // -----------------------------------------------
 
         function selectItem(plu) {
             activeProduct = database.find(i => i.plu == plu);
@@ -190,6 +195,7 @@
             document.getElementById('qty-wrapper').style.display = "block";
             document.getElementById('product-info-box').style.display = "block";
             document.getElementById('search-results').innerHTML = "";
+            document.getElementById('searchInput').value = "";
 
             const imgElement = document.getElementById('detail-img');
             imgElement.src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}_1.jpg`;
