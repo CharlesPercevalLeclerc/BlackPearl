@@ -93,7 +93,7 @@
 
             <div id="detail-area" style="display: none; border-top: 1px solid #333; margin-top: 20px; padding-top: 20px;">
                 <div id="product-info-box" class="product-detail-card">
-                    <img id="detail-img" class="big-image" src="" alt="Produk">
+                    <img id="detail-img" class="big-image" src="" alt="Produk" referrerpolicy="no-referrer">
                     <div id="selected-info" style="font-weight: 900; color: var(--accent); font-size: 1.1rem; text-transform: uppercase;"></div>
                     <div id="selected-plu" style="font-size: 0.8rem; color: #fff; margin-top: 5px; font-weight: 600;"></div>
                     <div id="selected-ean" style="font-size: 0.75rem; color: var(--text-dim); margin-top: 2px;"></div>
@@ -178,7 +178,9 @@
 
             resultsBox.innerHTML = filtered.map(item => `
                 <div class="result-item" onclick="selectItem('${item.plu}')">
-                    <img src="https://cdn-klik.klikindomaret.com/klik-catalog/product/${item.plu}_1.jpg" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
+                    <img src="https://cdn-klik.klikindomaret.com/klik-catalog/product/${item.plu}_1.jpg" 
+                         referrerpolicy="no-referrer" 
+                         onerror="this.onerror=null; this.src='https://cdn-klik.klikindomaret.com/klik-catalog/product/${item.plu}.jpg'; this.setAttribute('onerror', 'this.src=\'https://via.placeholder.com/100?text=No+Img\'')">
                     <div class="result-info">
                         <div class="p-name" style="font-weight:700;">${item.name}</div>
                         <div class="p-plu" style="font-size:0.7rem; color:var(--accent);">PLU: ${item.plu}</div>
@@ -199,6 +201,12 @@
 
             const imgElement = document.getElementById('detail-img');
             imgElement.src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}_1.jpg`;
+            imgElement.onerror = function() {
+                this.onerror = function() {
+                    this.src = 'https://via.placeholder.com/100?text=No+Img';
+                };
+                this.src = `https://cdn-klik.klikindomaret.com/klik-catalog/product/${activeProduct.plu}.jpg`;
+            };
             
             document.getElementById('selected-info').innerText = activeProduct.name;
             document.getElementById('selected-plu').innerText = "PLU: " + activeProduct.plu;
