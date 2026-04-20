@@ -304,9 +304,9 @@
             const akmS = sls + parse('akmSalesLalu');
             const akmSt = stk + parse('akmStrukLalu');
             
+            const spdNow = Math.round(akmS / d);            
             const ach = parse('targetSpd') > 0 ? Math.round((sls/parse('targetSpd'))*100) : 0;
-            
-            const spdNow = Math.round(akmS / d);
+
             const growSpd = parse('spdLalu') > 0 ? Math.round(((spdNow/parse('spdLalu'))*100)-100) : 0;
             
             const stdNow = Math.round(akmSt / d);
