@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BlackPearl | Sales Counter</title>
+    <title>BlackPearl | Hitung Sales</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -305,7 +305,7 @@
             const akmSt = stk + parse('akmStrukLalu');
             
             const spdNow = Math.round(akmS / d);            
-            const ach = parse('targetSpd') > 0 ? Math.round((sls/parse('targetSpd'))*100) : 0;
+            const ach = parse('targetSpd') > 0 ? Math.round((spdNow/parse('targetSpd'))*100) : 0;
 
             const growSpd = parse('spdLalu') > 0 ? Math.round(((spdNow/parse('spdLalu'))*100)-100) : 0;
             
